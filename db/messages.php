@@ -13,8 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-
 /**
  * 
  *
@@ -24,10 +22,10 @@
  * 					Nicolás Bañados Valladares (nbanados@alumnos.uai.cl)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-//Pertenece al plugin Reserva Salas
- 
- 
 defined('MOODLE_INTERNAL') || die();
-$plugin->pluginname = "local_bookingrooms";
-$plugin->component = 'local_bookingrooms';
-$plugin->version   = '2015053102';
+
+$messageproviders = array (
+		// Notify teacher that a student has submitted a quiz attempt
+		'reservenotification' => array (		
+		)
+);
