@@ -30,7 +30,7 @@ require_once($CFG->dirroot.'/local/bookingrooms/administration_tables.php');
 //Code to set context, url, layout
 global $PAGE, $CFG, $OUTPUT, $DB;
 require_login();
-$url = new moodle_url('/local/bookingrooms/estadisticas.php');
+$url = new moodle_url('/local/bookingrooms/statistics.php');
 $context = context_system::instance();//context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url($url);
@@ -46,7 +46,7 @@ $o = '';
 $title = get_string('statistics', 'local_bookingrooms');
 $PAGE->navbar->add(get_string('roomsreserve', 'local_bookingrooms'));
 $PAGE->navbar->add(get_string('adjustments', 'local_bookingrooms'));
-$PAGE->navbar->add($title, 'estadisticas.php');
+$PAGE->navbar->add($title, 'statistics.php');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 $o.= $OUTPUT->header();
@@ -90,17 +90,17 @@ $totaltobeconfirmedtoday = $DB->get_records_sql("select * from {bookingrooms_boo
 $table->data[] = array(get_string('totalforconfirm', 'local_bookingrooms'), count($totaltobeconfirmed) + count($totaltobeconfirmedtoday));
 
 //punished reservations
-$totalpunished = $DB->get_records_sql("select * from {bookingrooms_booking} where confirmed = 0 AND date_booking > 0 AND fecha_reserva < '$fechahoy' AND activa = 1");
-$totalcastigadashoy = $DB->get_records_sql("select * from {reservasalas_reservas} where confirmado = 0 AND fecha_reserva = '$fechahoy' AND modulo <= $modulo AND activa = 1");
-$table->data[] = array(get_string('totalpunished', 'local_reservasalas'), count($totalcastigadas) + count($totalcastigadashoy));
+$totalpunished = $DB->get_records_sql("select * from {bookingrooms_booking} where confirmed = 0 AND date_booking > 0 AND date_booking < '$todaydate' AND active = 1");
+$totalcastigadashoy = $DB->get_records_sql("select * from {bookingrooms_bookings} where confirmed = 0 AND date_booking = '$todaydate' AND module <= $module AND active = 1");
+$table->data[] = array(get_string('totalpunished', 'local_bookingrooms'), count($totalpunished) + count($totalpunishedtoday));
 
-//total alumnos bloqueados
-$totalbloqueados= $DB->get_records_sql("select * from {reservasalas_bloqueados} group by alumno_id");
-$table->data[] = array(get_string('studentblockedhistory', 'local_reservasalas'), count($totalbloqueados));
+//total blocked students
+$totalblocked= $DB->get_records_sql("select * from {bookingrooms_blocked} group by student_id");
+$table->data[] = array(get_string('studentblockedhistory', 'local_bookingrooms'), count($totalblocked));
 
-//alumnos bloqueados actual
-$totalbloqueados= $DB->get_records_sql("select * from {reservasalas_bloqueados} where estado=1 group by alumno_id");
-$table->data[] = array(get_string('studentblockpresent', 'local_reservasalas'), count($totalbloqueados));
+//students blocked to the date
+$totalblocked= $DB->get_records_sql("select * from {bookingrooms_blocked} where status=1 group by student_id");
+$table->data[] = array(get_string('studentblockpresent', 'local_bookingrooms'), count($totalblocked));
 
 
 

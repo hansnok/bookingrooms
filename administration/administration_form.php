@@ -58,7 +58,7 @@ class UserSearch extends moodleform{
 	}
 }
 //Form used to unblock a student
-class BlockStudentForm extends moodleform{
+class UnblockStudentForm extends moodleform{
 	function definition(){
 		global $CFG, $DB, $OUTPUT;
 		$usertype=$CFG->user;

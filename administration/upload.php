@@ -23,17 +23,17 @@
  * @copyright  2014 Nicolas Ba�ados
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-//pagina para bloquear alumnos.
+//Page to block a student
 
-require_once(dirname(__FILE__) . '/../../config.php'); //obligatorio
-require_once($CFG->dirroot.'/local/reservasalas/forms.php');
-require_once($CFG->dirroot.'/local/reservasalas/import_form.php');
-require_once($CFG->dirroot.'/local/reservasalas/tablas.php');
+require_once(dirname(__FILE__) . '/../../config.php'); //Mandatory
+require_once($CFG->dirroot.'/local/bookingrooms/administration_form.php');
+require_once($CFG->dirroot.'/local/bookingrooms/import_form.php');
+require_once($CFG->dirroot.'/local/bookingrooms/tables.php');
 require_once($CFG->libdir . '/csvlib.class.php');
 
 global $PAGE, $CFG, $OUTPUT, $DB;
 require_login();
-$url = new moodle_url('/local/reservasalas/upload.php'); 
+$url = new moodle_url('/local/bookingrooms/upload.php'); 
 $context = context_system::instance();//context_system::instance();
 //$id            = required_param('id', PARAM_INT); // course id
 $separator     = optional_param('separator', '', PARAM_ALPHA);
@@ -47,14 +47,14 @@ $PAGE->set_pagelayout('standard');
 
 
 
-$PAGE->navbar->add(get_string('roomsreserve', 'local_reservasalas'),'reservar.php');
+$PAGE->navbar->add(get_string('roomsreserve', 'local_bookingrooms'),'booking.php');
 $PAGE->navbar->add('CSV');
 echo $OUTPUT->header();
-if(!has_capability('local/reservasalas:upload', $context)) {
-	print_error(get_string('INVALID_ACCESS','Reserva_Sala'));
+if(!has_capability('local/bookingrooms:upload', $context)) {
+	print_error(get_string('INVALID_ACCESS','booking_room'));
 }
 if(isset($CFG->local_uai_debug) && $CFG->local_uai_debug==0) {
-	print_error(get_string('INVALID_ACCESS','Reserva_Sala'));
+	print_error(get_string('INVALID_ACCESS','booking_room'));
 	
 }
 $mform = new import_form(null, array('includeseparator'=>true, 'verbosescales'=>true));
@@ -150,35 +150,35 @@ if ($mform2->is_cancelled()){
 		}
 		
 		$data=new stdClass();
-		$data->fecha_reserva=$line[0];
-		$data->modulo=$line[1];
-		$data->confirmado=$line[2];
-		$data->activa=$line[3];
-		$data->alumno_id=$line[4];
-		$data->salas_id=$line[5];
+		$data->date_booking=$line[0];
+		$data->module=$line[1];
+		$data->confirmed=$line[2];
+		$data->active=$line[3];
+		$data->student_id=$line[4];
+		$data->rooms_id=$line[5];
 		
-		$data->comentario_alumno=$line[6];
-		$data->comentario_admin=$line[7];
+		$data->comment_student=$line[6];
+		$data->comment_admin=$line[7];
 		$data->ip=$line[8];
-		$data->fecha_creacion=$line[9];
-		$data->nombre_evento=$line[10];
-		$data->asistentes=$line[11];
-		if(!$duplicado=$DB->get_record('reservasalas_reservas',array('fecha_reserva'=>$data->fecha_reserva,'modulo'=>$data->modulo,
-		'salas_id'=>$data->salas_id,'activa'=>1))){
+		$data->date_creation=$line[9];
+		$data->name_event=$line[10];
+		$data->assistants=$line[11];
+		if(!$duplicated=$DB->get_record('bookingrooms_bookings',array('date_bookings'=>$data->date_booking,'module'=>$data->module,
+		'rooms_id'=>$data->rooms_id,'active'=>1))){
 		
-		$DB->insert_record('reservasalas_reservas', $data);
-		echo get_string('inserted', 'local_reservasalas');
+		$DB->insert_record('bookingrooms_bookings', $data);
+		echo get_string('inserted', 'local_bookingrooms');
 
 	}else{
-		$data->id=$duplicado->id;
-		$DB->update_record('reservasalas_reservas', $data);
-		echo get_string('updated', 'local_reservasalas');
+		$data->id=$duplicated->id;
+		$DB->update_record('bookingrooms_bookings', $data);
+		echo get_string('updated', 'local_bookingrooms');
 		
 	}
 	}
 
-	echo get_string('informationadded', 'local_reservasalas');
-    echo $OUTPUT->single_button($url, get_string('return', 'local_reservasalas'));
+	echo get_string('informationadded', 'local_bookingrooms');
+    echo $OUTPUT->single_button($url, get_string('return', 'local_bookingrooms'));
 
 }else{
 	$mform2->display();
