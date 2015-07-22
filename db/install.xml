@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/bookingrooms/db" VERSION="20150722" COMMENT="XMLDB file for Moodle local/bookingrooms"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="bookingrooms_campus" COMMENT="campus of the university with study rooms">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false" COMMENT="name or location of the headquarters"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bookingrooms_buildings" COMMENT="buildings of the campus">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="campus_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="campus_id" TYPE="foreign" FIELDS="campus_id" REFTABLE="bookingrooms_campus" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bookingrooms_rooms" COMMENT="rooms of the buildings">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="name_pc" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="buildings_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Type of room"/>
+        <FIELD NAME="capaciy" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Room capacity"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="buildings_id" TYPE="foreign" FIELDS="buildings_id" REFTABLE="bookingrooms_buildings" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bookingrooms_reserves" COMMENT="room reservation">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="date_reserve" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="module" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="confirmed" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="active" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="It refers to the reservation is made"/>
+        <FIELD NAME="student_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="rooms_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="coment_student" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="coment_admin" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="ip" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="date_creation" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="here the date of creation of reserves is saved"/>
+        <FIELD NAME="name_event" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="assistant" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="rooms_id" TYPE="foreign" FIELDS="rooms_id" REFTABLE="bookingrooms_rooms" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bookingrooms_blocked" COMMENT="Table created to have the registration of block students">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="date_block" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="id_reserve" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="The id of the reservation is only add if the lock is attached is added to a reservation"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="commentary" TYPE="char" LENGTH="150" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="student_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bookingrooms_modules" COMMENT="Modules corresponding to buildings">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name_module" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="module name"/>
+        <FIELD NAME="hour_start" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="time that start the module"/>
+        <FIELD NAME="hour_end" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Time that finish the module"/>
+        <FIELD NAME="building_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Key that relates to the building module"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="building_id" TYPE="foreign" FIELDS="building_id" REFTABLE="bookingrooms_buildings" REFFIELDS="id" COMMENT="Key that relates to the building module"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bookingrooms_otherreserves" COMMENT="Reservations for meeting rooms and classrooms">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="date_reserve" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Date for which reserves Room"/>
+        <FIELD NAME="date_creation" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Date on which the reservation is made"/>
+        <FIELD NAME="module" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Module in which reserves"/>
+        <FIELD NAME="user_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="id of the user who made ​​the reservation"/>
+        <FIELD NAME="coment_user" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="user review"/>
+        <FIELD NAME="name_event" TYPE="char" LENGTH="50" NOTNULL="false" DEFAULT="No name" SEQUENCE="false" COMMENT="name of the event to be held in the hall"/>
+        <FIELD NAME="assistant_event" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="number of attendees"/>
+        <FIELD NAME="coment_event" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Comment for the event"/>
+        <FIELD NAME="ip" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="ip of the pc in the room"/>
+        <FIELD NAME="rooms_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="id room reserved"/>
+        <FIELD NAME="id_responsible" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="rooms_id" TYPE="foreign" FIELDS="rooms_id" REFTABLE="bookingrooms_rooms" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bookingrooms_roomresource" COMMENT="Relationship room and resources">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="rooms_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="id room"/>
+        <FIELD NAME="resources_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="resource id"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="resources_id" TYPE="foreign" FIELDS="resources_id" REFTABLE="bookingrooms_resorces" REFFIELDS="id"/>
+        <KEY NAME="rooms_id" TYPE="foreign" FIELDS="rooms_id" REFTABLE="bookingrooms_rooms" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bookingrooms_resources" COMMENT="Resource of the rooms">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the resource"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
