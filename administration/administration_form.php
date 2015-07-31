@@ -18,22 +18,25 @@
 /**
  *
 * @package    local
-* @subpackage reservasalas
+* @subpackage bookingrooms
 * @copyright  2014 Francisco García Ralph (francisco.garcia.ralph@gmail.com)
 * 				   Nicolás Bañados Valladares (nbanados@alumnos.uai.cl)
 *             2015 Mihail Pozarski Rada (mipozarski@alumnos.uai.cl)
+*             2015 Sebastian Riveros (sriveros@alumnos.uai.cl)
 * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 //Form used in blocked.php
 //Ask for a institutional email to get a module blocked
+require_once(dirname(dirname(__FILE__)) . '/../../config.php'); //mandatory
+require_once($CFG->libdir.'/formslib.php');
 class UserSearch extends moodleform{
 	function definition() {
 		global $CFG;
 		$usertype=$CFG->user;
 		$mform =& $this->_form;
-		$mform->addElement('text', 'user', get_string('uaiemail', 'local_bookingrooms').': ');
-		$mform->setType('user', PARAM_TEXT);
-		$mform->addRule('user', get_string('uaiemail', 'local_bookingrooms'), 'required');
+		$mform->addElement('text', 'email', get_string('uaiemail', 'local_bookingrooms').': ');
+		$mform->setType('email', PARAM_TEXT);
+		$mform->addRule('email', get_string('uaiemail', 'local_bookingrooms'), 'required');
 		$mform->addElement('static','','', $usertype);
 		$mform->addElement('textarea', 'comment', get_string('comment', 'local_bookingrooms').': ', 'cols="40" rows="10"' );
 
@@ -42,30 +45,37 @@ class UserSearch extends moodleform{
 	function validation($data,$files) {
 		global $DB;
 		$errors=array();
-
-		if($user = $DB->get_record('user', array('mail'=>$data['user']))){
+       if(!empty($data['email'])){
+		if($user = $DB->get_record('user', array('email'=>$data['email']))){
 			if($blocked = $DB->get_records('bookingrooms_blocked', array('student_id'=>$user->id))){
-				foreach($blocked as block){
-					if($block->status ==1){
-						$errors['user'] = '*'.get_string('blockuser', 'local_bookingrooms');
+				foreach($blocked as $block) {
+					if($block->status == 1){
+						$errors['email'] = get_string('blockuser', 'local_bookingrooms');
 					}
 				}
 			}
-		}else{
-			$errors['user'] = '*'.get_string('notuser', 'local_bookingrooms').': ';
+		else{
+			$errors['email'] = get_string('notuser', 'local_bookingrooms');
+		}
+		}
+       }
+		else{
+			$errors['email'] = get_string('empty', 'local_bookingrooms');
 		}
 		return $errors;
-	}
 }
+}
+
+
 //Form used to unblock a student
 class UnblockStudentForm extends moodleform{
 	function definition(){
 		global $CFG, $DB, $OUTPUT;
 		$usertype=$CFG->user;
 		$mform =& $this->_form;
-		$mform->addElement('text', 'user', get_string('uaiemail', 'local_bookingrooms').': ');
-		$mform->addRule('user', get_string('uaiemail', 'local_bookingrooms'), 'required');
-		$mform->setType('user', PARAM_TEXT);
+		$mform->addElement('text', 'email', get_string('uaiemail', 'local_bookingrooms').': ');
+		$mform->addRule('email', get_string('uaiemail', 'local_bookingrooms'), 'required');
+		$mform->setType('email', PARAM_TEXT);
 		$mform->addElement('static','','', $usertype);
 		$mform->addElement('textarea', 'comment', get_string('comment', 'local_bookingrooms').': ', 'cols="40" rows="10"' );
 
@@ -76,17 +86,22 @@ class UnblockStudentForm extends moodleform{
 		$errors=array();
 		$datenow = date('Y-m-d');
 		$blocked = false;
-		if($user = $DB->get_record('user', array('username'=>$data['user']))){
+		if(!empty($data['email'])){
+		if($user = $DB->get_record('user', array('email'=>$data['email']))){
 
 			if($DB->get_record('bookingrooms_blocked',array('student_id'=>$user->id,'status'=>1))){
 				$blocked = true;
 			}
 
 			if($blocked==false){
-				$errors['user'] = '*'.get_string('unblockuser', 'local_bookingrooms').': ';
+				$errors['email'] = get_string('unblockuser', 'local_bookingrooms');
 			}
 		}else{
-			$errors['user'] = '*'.get_string('notuser', 'local_bookingrooms').': ';
+			$errors['email'] = get_string('notuser', 'local_bookingrooms');
+		}
+		}
+		else{
+			$errors['email'] = get_string('empty', 'local_bookingrooms');
 		}
 		return $errors;
 	}
@@ -125,6 +140,7 @@ class ChangeBookedRoom extends moodleform{
 		return $errors;
 	}
 }
+
 //From used un bookinghistory.php
 class AdminComment extends moodleform{
 	function definition(){

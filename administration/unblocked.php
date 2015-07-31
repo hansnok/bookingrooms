@@ -19,14 +19,13 @@
  * 
  *
  * @package    local
- * @subpackage reservasalas
- * @copyright  2013 Marcelo Epuyao
+ * @subpackage bookingrooms
+ * @copyright  2015 Sebastian Riveros
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../config.php'); //Mandatory
-require_once($CFG->dirroot.'/local/bookingrooms/administration_form.php');
-require_once($CFG->dirroot.'/local/reservasalas/administration_tables.php');
+require_once(dirname(dirname(__FILE__)) . '/../../config.php'); //Mandatory
+require_once($CFG->dirroot.'/local/bookingrooms/administration/administration_form.php');
 
 
 global $PAGE, $CFG, $OUTPUT, $DB;
@@ -41,61 +40,51 @@ $PAGE->set_pagelayout('standard');
 //Capabilities
 //Validates capabilities of the user for him to see the content
 //In this case only the admin of the module can access.
-if(!has_capability('local/bookingrooms:blocking', $context)) {
-		print_error(get_string('INVALID_ACCESS','booking_room'));
-}
+if(!has_capability('local/bookingrooms:blocking', $context)) 
+	{
+		print_error(get_string('invalidaccess','local_bookingrooms'));
+	}
 //Migas de pan
 $PAGE->navbar->add(get_string('roomsreserve', 'local_bookingrooms'));
 $PAGE->navbar->add(get_string('users', 'local_bookingrooms'));
 $PAGE->navbar->add(get_string('unblockstudent', 'local_bookingrooms'));
 
-//$PAGE->set_title('UAI Webcursos');
-//$PAGE->set_heading('UAI Webcursos');
-
 //Form to unblock a student
 $unblockform = new UnblockStudentForm();
 
-if($fromform = $unblcokform->get_data()){
+if($fromform = $unblockform->get_data()){
 	//if the form is sent, the student exists and it is blocked, then it will be unblocked.
 	//else it will show a mesage according to the error.
-	if($user = $DB->get_record('user',array('username'=>$fromform->user))){
+	if($user = $DB->get_record('user',array('email'=>$fromform->email))){
 		$datenow = date('Y-m-d');
-		if($block = $DB->get_record('bookingrooms_blocked',array('student_id'=>$user->id,'status'=>1))){//('reservasalas_bloqueados', array('alumno_id'=>$user->id));
+		if($block = $DB->get_record('bookingrooms_blocked',array('student_id'=>$user->id,'status'=>1))){
 			$record = new stdClass();
 			$record->id = $block->id;
-			$record->id_booking = $block->id_booking;
-			$record->comments = $fromform->comment;
+			$record->id_reserve = $block->id_reserve;
+			$record->comments = $fromform->commentary;
 			$record->status = 0;
 	
 			$DB->update_record('bookingrooms_blocked', $record);
 			$unblock = true;
-		}else{
-			print_error(get_string('noblock', 'local_bookingrooms'));
-		}		
-	}else{
-		print_error(get_string('noexist', 'local_bookingrooms'));
+		}
 	}
 }
 
 //the page loads al least the titule, head anda breadcrumbs.
-$o = '';
 $title = get_string('unblockstudent', 'local_bookingrooms');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
-$o .= $OUTPUT->header();
-$o .= $OUTPUT->heading($title);
+echo $OUTPUT->header();
+echo $OUTPUT->heading($title);
 
 //if its the first time the page is loaded it will show the unblock students form,
 //if the info is already entered and it's correct a unblock mesage will appear and
 //if it's incorrect the corresponding error will appear 
 if(isset($unblock)){
-	$o.= get_string('thestudent', 'local_bookingrooms').$user->firstname." ".$user->lastname.get_string('beenunlocked', 'local_bookingrooms');
-	$o .= $OUTPUT->single_button('unblock.php', get_string('unblockagain', 'local_bookingrooms'));
+	echo get_string('thestudent', 'local_bookingrooms').$user->firstname." ".$user->lastname.get_string('beenunlocked', 'local_bookingrooms');
+	echo $OUTPUT->single_button('unblock.php', get_string('unblockagain', 'local_bookingrooms'));
 }else{
-	ob_start();
+	
     $unblockform->display();
-    $o .= ob_get_contents();
-    ob_end_clean();
 }
-$o .= $OUTPUT->footer();
-echo $o;
+echo $OUTPUT->footer();

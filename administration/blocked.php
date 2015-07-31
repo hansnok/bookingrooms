@@ -19,17 +19,16 @@
  * 
  *
  * @package    local
- * @subpackage reservasalas
- * @copyright  2013 Marcelo Epuyao
+ * @subpackage bookingrooms
+ * @copyright  2015 Sebastian Riveros
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 //page to block students.
 //git tests
-require_once(dirname(__FILE__) . '/../../config.php'); //mandatory
-require_once($CFG->dirroot.'/local/bookingrooms/administration_form.php');
-require_once($CFG->dirroot.'/local/bookingrooms/administration_tablas.php');
+require_once(dirname(dirname(__FILE__)) . '/../../config.php'); //mandatory
+require_once($CFG->dirroot.'/local/bookingrooms/administration/administration_form.php');
 
 
 global $PAGE, $CFG, $OUTPUT, $DB;
@@ -44,7 +43,7 @@ $PAGE->set_pagelayout('standard');
 //Validates capabilities of the user for him to see the content
 //In this case only the admin of the module can access.
 if(!has_capability('local/bookingrooms:blocking', $context)) {
-		print_error(get_string('INVALID_ACCESS','book_room'));
+		print_error(get_string('invalidaccess','local_bookingrooms'));
 }
 
 //Breadcrumbs
@@ -57,45 +56,37 @@ $PAGE->navbar->add(get_string('blockstudent', 'local_bookingrooms'),'blocked.php
 $search = new UserSearch(null);
 if($fromform = $search->get_data()){
 	//Blocks the user in the database
-	if($user = $DB->get_record('user',array('username'=>$fromform->user))){
+	if($user = $DB->get_record('user',array('email'=>$fromform->email))){
 		$record = new stdClass();
-		$record->comments = $fromform->comment;
+		$record->comments = $fromform->commentary;
 		$record->student_id = $user->id;
 		$record->status = 1;
-		$record->block_date = date('Y-m-d');
-		$record->id_booking = ""; 
+		$record->date_block = date('Y-m-d');
+		$record->id_reserve = ""; 
 		
-		$DB->insert_record('bookingrppms_blocked', $record);
+		$DB->insert_record('bookingrooms_blocked', $record);
 		$block = true;
-	}else{
-		print_error("error");
 	}
 }
 
 //loads the page, al least title, head and breadcrumbs.
 
-$o = '';
 $title = get_string('blockstudent', 'local_bookingrooms');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
-$o .= $OUTPUT->header();
-$o .= $OUTPUT->heading($title);
+echo   $OUTPUT->header();
+echo   $OUTPUT->heading($title);
 
 
 //Depending if the institutional mail is correct, and at the same time
 //the user is not blocked, or it it blocked
 //the infromation will be deployed to the corresponding success or falure in the operation.
 if(isset($blocked)){
-	$o.= get_string('thestudent', 'local_bookingrooms').$user->firstname." ".$user->lastname.get_string('suspendeduntilthe', 'local_bookingrooms').date('d-m-Y', strtotime("+ 3 days"));
-	$o .= $OUTPUT->single_button('blocked.php', get_string('blockagain', 'local_bookingrooms'));
+	echo get_string('thestudent', 'local_bookingrooms').$user->firstname." ".$user->lastname.get_string('suspendeduntilthe', 'local_bookingrooms').date('d-m-Y', strtotime("+ 3 days"));
+	echo $OUTPUT->single_button('blocked.php', get_string('blockagain', 'local_bookingrooms'));
 }else{
-	//$o .= "<strong>NAme:</strong> ".$user->firstname." ".$user->lastname;
-	ob_start();
-    $search->display();
-    $o .= ob_get_contents();
-    ob_end_clean();
+    $search->display();  
 }
 
-$o .= $OUTPUT->footer();
+echo $OUTPUT->footer();
 
-echo $o;

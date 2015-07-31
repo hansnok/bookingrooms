@@ -27,4 +27,4 @@
 defined('MOODLE_INTERNAL') || die();
 $plugin->pluginname = "local_bookingrooms";
 $plugin->component = 'local_bookingrooms';
-$plugin->version   = '2015072202';
+$plugin->version   = '2015072203';
